@@ -2,6 +2,7 @@
 import time
 import sys
 
+#testing changes (DEL LATER)
 #define variables and lists
 options = ["Exit", "IVR triangle", "Notation prefix conversions", "Resistance calculations"]
 notationoptions = ["Back, ""Find notation conversion units", "# of exponent change from unit to unit"]
