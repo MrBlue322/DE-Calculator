@@ -2,7 +2,6 @@
 import time
 import sys
 
-#testing changes (DEL LATER)
 #define variables and lists
 options = ["Exit", "IVR triangle", "Notation prefix conversions", "Resistance calculations"]
 notationoptions = ["Back, ""Find notation conversion units", "# of exponent change from unit to unit"]
@@ -63,7 +62,7 @@ def convert(self, symbol1, num1, symbol2):
 
 #main loop
 while True:
-    print("\n\nWelcome to the 'STEM Sophomore Directory 🤓'")
+    print("\n\nWelcome to the 'STEM Sophomore Calculator Directory 🤓'")
     print("\n[ - Credits: Andrew K and Dawson B - ]\n")
 
     for index, obj in enumerate(options):
@@ -99,39 +98,38 @@ while True:
             ivr_find = input()
             ivr_find = ivr_find.lower()
 
-            if ivr_find == "back" or "1":
+            if ivr_find in ["back", "1"]:
                 break
 
-            if ivr_find == "i" or "v" or "r" or "2" or "3" or "4":
-                    
+            if ivr_find in ["i", "v", "r", "2", "3","4"]:
 
-                print("Be sure that your objects are in the same SI unit(Ex: 3 kV = 3000V)")
+                print("Be sure that your objects are in the same SI unit (Ex: 3 kV = 3000V)")
                 print("(Use the tranformation device for this)\n")
                 try:
                     #ivr find what you are calculating
-                    if ivr_find == "i":
+                    if ivr_find in  ["i","2"]:
 
                         v = int(input("What is the Voltage: "))
-                        r = int(input("What is the Restence: "))
+                        r = int(input("What is the Resistance: "))
                         print()
-                        print("Answer is {}\n".format(i_vr(v,r)))
+                        print("Current is {}A\n".format(i_vr(v,r)))
                             
-                    if ivr_find == "v":
+                    if ivr_find in ["v", "3"]:
                         i = int(input("What is the current: "))
-                        r = int(input("What is the Restence: "))
+                        r = int(input("What is the Resistance: "))
                         print()
     
-                        print("Answer is {}\n".format(v_ir(i,r)))
+                        print("Voltage is {}V\n".format(v_ir(i,r)))
 
 
     
-                    if ivr_find == "r":
+                    if ivr_find in ["r","4"]:
                         i = int(input("What is the current: "))
                         v = int(input("What is the Voltage: "))
     
                         print()
-                        print("Answer is {}\n".format(r_vi(i,v)))
-                        print("Be sure that these mumbers are the right SI unit\n")
+                        print("Resistance is {}Ω\n".format(r_vi(i,v)))
+                        print("Be sure that these numbers are in the right SI unit\n")
                 except ValueError:
                     print("That wasn't a number. Try again")
                         
