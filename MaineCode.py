@@ -109,27 +109,29 @@ while True:
                     #ivr find what you are calculating
                     if ivr_find in  ["i","2"]:
 
-                        v = int(input("What is the Voltage: "))
-                        r = int(input("What is the Resistance: "))
+                        v = float(input("What is the Voltage: "))
+                        r = float(input("What is the Resistance: "))
                         print()
-                        print("Current is {}A\n".format(i_vr(v,r)))
+                        print("****Current is {}A****\n".format(i_vr(v,r)))
                             
                     if ivr_find in ["v", "3"]:
-                        i = int(input("What is the current: "))
-                        r = int(input("What is the Resistance: "))
+                        i = float(input("What is the current: "))
+                        r = float(input("What is the Resistance: "))
                         print()
     
-                        print("Voltage is {}V\n".format(v_ir(i,r)))
+                        print("****Voltage is {}V****\n".format(v_ir(i,r)))
 
 
-    
+            
                     if ivr_find in ["r","4"]:
-                        i = int(input("What is the current: "))
-                        v = int(input("What is the Voltage: "))
+                        i = float(input("What is the current: "))
+                        v = float(input("What is the Voltage: "))
     
                         print()
-                        print("Resistance is {}Ω\n".format(r_vi(i,v)))
-                        print("Be sure that these numbers are in the right SI unit\n")
+                        print("****Resistance is {}Ω****\n".format(r_vi(v,i)))
+                        print("Be sure that this numbers is in the right SI unit\n")
+                        
+                    time.sleep(2)
                 except ValueError:
                     print("That wasn't a number. Try again")
                         
