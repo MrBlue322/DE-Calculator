@@ -3,12 +3,26 @@ import time
 import sys
 
 #define variables and lists
-options = ["Exit", "IVR triangle", "Notation prefix conversions", "Resistance calculations"]
-notationoptions = ["Back, ""Find notation conversion units", "# of exponent change from unit to unit"]
+notationnumbers = [-12, -9, -6, 3, 0, 3, 6, 9, 12]
+notationlist = ["pico", "nano", "micro", "milli", "\b", "kilo", "mega", "giga", "tera"] #The \b stands for backspace in escape characters
+
+capacitorcodeletters = ["NONE", "A", "B", "C", "D", "F", "G", "J", "K", "M", "N", "Q", "S", "T", "Z"]
+capactorcodetolerance = 20, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 30 #Didnt continue on because Q S T and Z are special and have specific minuses and pluses
+
+resistorcolorcode = ["black", "brown", "red", "orange", "yellow", "green", "blue", "purple", "gray", "white"]
+
+options = ["Exit", "IVR triangle", "Notation prefix conversions", "Resistance calculations", "Resistor Color Code", "Capacitor Code"]
+notationoptions = ["Back", "Find notation conversion units", "# of exponent change from unit to unit", "compact number into notation", "Compact number into units"]
 triangle = ["Back", "Find Current (i)", "Find voltage (v)","Find Resistance (r)"]
+
+
 v = 0
 i = 0
 r = 0
+
+engineeringnotationconvert1 = 0
+
+loadingdelay = 1
 
 """
 SPECIAL CHARACTER ARCHIVE:
@@ -48,20 +62,134 @@ def sResistence(args):      #args must contain only ints
 def convert(self, symbol1, num1, symbol2):
     pass
 
+
+def engineering_notation(number):
+    # Handle zero
+    if number == 0:
+        return "0"
+
+    # Determine the exponent of the number
+    exponent = 0
+    while abs(number) < 1 or abs(number) >= 1000:
+        if abs(number) < 1:
+            number *= 1000
+            exponent -= 3
+        else:
+            number /= 1000
+            exponent += 3
+
+    # Convert to a string in engineering notation
+    return "{:.2f} x 10^{}".format(number, exponent)
+
+
+def compact_engineering_notation(value):
+    prefixes = {
+        'pico': 1e-12,
+        'nano': 1e-9,
+        'micro': 1e-6,
+        'milli': 1e-3,
+        'regular': 1e0,  # Base unit
+        'kilo': 1e3,
+        'mega': 1e6,
+        'giga': 1e9,
+        'tera': 1e12
+    }
+
+    for prefix, multiplier in prefixes.items():
+        if abs(value) >= multiplier:
+            compact_value = value / multiplier
+            if abs(compact_value) < 1000:
+                return "{:.3g} {}".format(compact_value, prefix)
+    return "{:.3g}".format(value)
+
+
+def convert_prefix(value, from_prefix, to_prefix):
+    prefixes = {
+        'pico': 1e-12,
+        'nano': 1e-9,
+        'micro': 1e-6,
+        'milli': 1e-3,
+        'regular' : 1e0,
+        'kilo': 1e3,
+        'mega': 1e6,
+        'giga': 1e9,
+        'tera': 1e12
+    }
+
+    # Check if the provided prefixes are valid
+    if from_prefix not in prefixes or to_prefix not in prefixes:
+        return "Invalid prefixes"
+
+    # Perform the conversion
+    converted_value = value * (prefixes[from_prefix] / prefixes[to_prefix])
+    return converted_value
+
+
+def calculate_resistor_value(first_color, second_color, third_color, fourth_color=None):
+    color_codes = {
+        'black': 0,
+        'brown': 1,
+        'red': 2,
+        'orange': 3,
+        'yellow': 4,
+        'green': 5,
+        'blue': 6,
+        'violet': 7,
+        'gray': 8,
+        'white': 9
+    }
+
+    multiplier_values = {
+        'black': 1,
+        'brown': 10,
+        'red': 100,
+        'orange': 1000,
+        'yellow': 10000,
+        'green': 100000,
+        'blue': 1000000,
+        'violet': 10000000
+    }
+
+    tolerance_values = {
+        'gold': '+/- 5%',
+        'silver': '+/- 10%',
+        'none': '+/- 20%'
+    }
+
+    ohm_symbol = '\u03A9'  # Unicode for the ohm symbol (Ω)
+
+    try:
+        digit1 = color_codes[first_color]
+        digit2 = color_codes[second_color]
+        multiplier = multiplier_values[third_color]
+
+        resistance = (digit1 * 10 + digit2) * multiplier
+
+        if fourth_color is not None:
+            tolerance = tolerance_values.get(fourth_color, 'Invalid tolerance color')
+            result = "Resistance value: {} {} ohms, Tolerance: {}".format(resistance, ohm_symbol, tolerance)
+        else:
+            result = "Resistance value: {} {} ohms".format(resistance, ohm_symbol)
+
+        return result
+
+    except KeyError:
+        return "Invalid color code"
+
+
 #See how much notation between each
 #Ex. kilo to regular 10^3
 #logarithm - How much an exponent goes up between 2 numbers
 #Ex. 10 -> 1000 = 3
 
 
-#Give symbol if multiply number by 10^? 
+#Give symbol / name if multiply number by 10^? 
 #Ex. kilo to mega if 10^3
 #Ex. kilo to milli if 10^-6
 
-
-
 #main loop
 while True:
+    time.sleep(loadingdelay)
     print("\n\nWelcome to the 'STEM Sophomore Calculator Directory 🤓'")
     print("\n[ - Credits: Andrew K and Dawson B - ]\n")
 
@@ -88,6 +216,7 @@ while True:
 
     if action == 2:
         while True:
+            time.sleep(loadingdelay)
             print("\n[ - IVR TRIANGLE - ]\n\n")
 
             for index, obj in enumerate(triangle):
@@ -112,14 +241,14 @@ while True:
                         v = float(input("What is the Voltage: "))
                         r = float(input("What is the Resistance: "))
                         print()
-                        print("****Current is {}A****\n".format(i_vr(v,r)))
+                        print("****Current is {} A****\n".format(i_vr(v,r)))
                             
                     if ivr_find in ["v", "3"]:
                         i = float(input("What is the current: "))
                         r = float(input("What is the Resistance: "))
                         print()
     
-                        print("****Voltage is {}V****\n".format(v_ir(i,r)))
+                        print("****Voltage is {} V****\n".format(v_ir(i,r)))
 
 
             
@@ -128,19 +257,15 @@ while True:
                         v = float(input("What is the Voltage: "))
     
                         print()
-                        print("****Resistance is {}Ω****\n".format(r_vi(v,i)))
+                        print("****Resistance is {} Ω****\n".format(r_vi(v,i)))
                         print("Be sure that this numbers is in the right SI unit\n")
                         
-                    time.sleep(2)
+                    time.sleep(loadingdelay)
                 except ValueError:
-                    print("That wasn't a number. Try again")
+                    print("That wasn't valid. Try again")
                         
             else:
                 print("type the letter i, v, r, or the number")
-    else:
-        print("type the letter i, v, r, or the number")
-        continue
-    
 
     if action == 3:
         while True:
@@ -149,17 +274,64 @@ while True:
                 print('[{}] {}'.format(index+1,obj))
             notationchoice = input("\nWhat will you choose?\n")
             try:
-                action = int(action)
+                notationchoice = int(notationchoice)
             except:
                 print("Cannot convert")
                 continue
 
             if notationchoice == 1:
+                break
+
+            #notation conversion
+            if notationchoice == 2:
             
-                convert1 = input("What number will you be converting first?")
-            try:
-                convert1 = int(convert1)
-            except:
-                print("unable to convert to int.")
-                sys.exit()
-            prefixnum1 = input("what unit ")
+                # Ask for user input
+                value = float(input("What is your starting number? "))
+                from_prefix = input("What is the starting unit (ex. pico, nano, micro, milli, regular, kilo, mega, giga, tera)? ").lower()
+                to_prefix = input("What unit do you want to convert to (ex. pico, nano, micro, milli, regular, kilo, mega, giga, tera)? ").lower()
+
+                # Perform the conversion
+                result = convert_prefix(value, from_prefix, to_prefix)
+                print("\n{} {} ---> {} {}\n".format(value, from_prefix, result, to_prefix))
+                print("TIPS: If the number ends in .00 you can just leave the whole number as it is.")
+                print("If the number ends in a bunch of zeros and a random num at the end just look for the last number before the trail and that should be the right number. We can't convert decimal places because that might ruin the conversion method.\n\n")
+            
+            #compaction
+            if notationchoice == 4:
+                print("What number are you compacting? TYPE FULL NUMBER (Ex. 650000000)")
+                engineeringnotationconvert1 = input()
+                
+                try:
+                    engineeringnotationconvert1 = float(engineeringnotationconvert1)
+                except:
+                    print("Cannot convert")
+                    continue
+            
+                print("\n**** Notation Product is: {} ****\n".format(engineering_notation(engineeringnotationconvert1)))
+                print("TIPS: If the number ends in .00 you can just leave the whole number as it is.")
+                print("If the number ends in a bunch of zeros and a random num at the end just look for the last 0 and that should be the right number. We can't convert decimal places because that might ruin the conversion method.\n\n")
+            if notationchoice == 5:
+                # Ask the user for input
+                value = float(input("What number do you want to compact? (MUST BE STANDARD UNITS)"))
+
+                # Call the function to compact the number
+                result = compact_engineering_notation(value)
+
+                print("\nCompact Engineering Notation: {}".format(result))
+
+    if action == 5:
+        while True:
+            print("\nTIP: USE VIOLET INSTEAD OF PURPLE FOR THE CODE TO WORK.\n")
+            # Input resistor color bands
+            first_band = input("Enter the color of the first band: ").lower()
+            second_band = input("Enter the color of the second band: ").lower()
+            third_band = input("Enter the color of the third band: ").lower()
+
+            # Optional: Input tolerance band
+            fourth_band = input("Enter the color of the fourth (tolerance) band (optional): ").lower()
+
+            # Calculate resistance value
+            result = calculate_resistor_value(first_band, second_band, third_band, fourth_band)
+
+            print(result)
+            break
