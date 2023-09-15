@@ -2,19 +2,31 @@
 import time
 import sys
 
-#define variables and lists
-notationnumbers = [-12, -9, -6, 3, 0, 3, 6, 9, 12]
-notationlist = ["pico", "nano", "micro", "milli", "\b", "kilo", "mega", "giga", "tera"] #The \b stands for backspace in escape characters
+capacitorcode = {
+        'NONE': 20,
+        'A': 0.05,
+        'B': 0.1,
+        'C': 0.25,
+        'D': 0.5,  
+        'F': 1,
+        'G': 2,
+        'J': 5,
+        'K': 10,
+        'M': 20,
+        'N': 30,
+    }
+
+
 
 capacitorcodeletters = ["NONE", "A", "B", "C", "D", "F", "G", "J", "K", "M", "N", "Q", "S", "T", "Z"]
-capactorcodetolerance = 20, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 30 #Didnt continue on because Q S T and Z are special and have specific minuses and pluses
+capactorcodetolerance = 20, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 30 #Didnt continue on because Q S T and Z are special and have specific minuses and pluses, Imma prob just use a dictionary
 
-resistorcolorcode = ["black", "brown", "red", "orange", "yellow", "green", "blue", "purple", "gray", "white"]
 
-options = ["Exit", "IVR triangle", "Notation prefix conversions", "Resistance calculations", "Resistor Color Code", "Capacitor Code"]
+options = ["Exit", "IVR triangle", "Notation prefix conversions", "Resistance calculations", "Resistor Color Code", "Capacitor Code", "Find Min/Max Tolerance based on number"]
 notationoptions = ["Back", "Find notation conversion units", "# of exponent change from unit to unit", "compact number into notation", "Compact number into units"]
 triangle = ["Back", "Find Current (i)", "Find voltage (v)","Find Resistance (r)"]
 
+ohm_symbol = "Ω" #variable for ohm symbol
 
 v = 0
 i = 0
@@ -156,7 +168,6 @@ def calculate_resistor_value(first_color, second_color, third_color, fourth_colo
         'none': '+/- 20%'
     }
 
-    ohm_symbol = '\u03A9'  # Unicode for the ohm symbol (Ω)
 
     try:
         digit1 = color_codes[first_color]
@@ -165,7 +176,7 @@ def calculate_resistor_value(first_color, second_color, third_color, fourth_colo
 
         resistance = (digit1 * 10 + digit2) * multiplier
 
-        if fourth_color is not None:
+        if fourth_color != "":
             tolerance = tolerance_values.get(fourth_color, 'Invalid tolerance color')
             result = "Resistance value: {} {} ohms, Tolerance: {}".format(resistance, ohm_symbol, tolerance)
         else:
@@ -176,6 +187,21 @@ def calculate_resistor_value(first_color, second_color, third_color, fourth_colo
     except KeyError:
         return "Invalid color code"
 
+def tolerance_calc(tolerating_number, sub_tolerance_percent, add_tolerance_percent):
+    
+    tolerating_number = float(tolerating_number)
+
+    sub_tolerance = float(sub_tolerance_percent) * float(tolerating_number)
+    sub_tolerance = sub_tolerance / 100
+
+    add_tolerance = float(add_tolerance_percent) * float(tolerating_number)
+    add_tolerance = add_tolerance / 100
+
+    min_tolerance = tolerating_number - sub_tolerance
+    max_tolerance = tolerating_number + add_tolerance
+
+    tolerate_result = "Min Acc Value: {}\nMax Acc Value: {}".format(min_tolerance, max_tolerance)
+    return tolerate_result
 
 #See how much notation between each
 #Ex. kilo to regular 10^3
@@ -186,6 +212,21 @@ def calculate_resistor_value(first_color, second_color, third_color, fourth_colo
 #Give symbol / name if multiply number by 10^? 
 #Ex. kilo to mega if 10^3
 #Ex. kilo to milli if 10^-6
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #main loop
 while True:
@@ -204,7 +245,7 @@ while True:
         print("Cannot convert")
         continue
 
-    if 0 < action < len(options):
+    if 0 < action <= len(options):
         pass
     else:
         print("That was not a choice\n")
@@ -334,4 +375,16 @@ while True:
             result = calculate_resistor_value(first_band, second_band, third_band, fourth_band)
 
             print(result)
+            break
+
+    if action == 7:
+        while True:
+        
+            print("\nTIP: You do not need to include units on this one because you can just add the prefix (Ex. 18'k'Ω ±5% --> 17.1'k' --> 18.9'k')")
+            print("TIP: If your tolerating value is not a seperate number, (Ex. +/- 20%) then use 20 for both subtracting percentage and addition percentage.\n")
+            tolerating_number = input("What is your Nominal Value?")
+            sub_tolerance_percent = input("What percent is your subtracting tolerance value?")
+            add_tolerance_percent = input("What percent is your addition tolerance value?")
+            tolerate_result = tolerance_calc(tolerating_number, sub_tolerance_percent, add_tolerance_percent)
+            print("\n" + tolerate_result)
             break
